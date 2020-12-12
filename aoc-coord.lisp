@@ -58,12 +58,12 @@
     (numberp (get-x c))
     (numberp (get-y c))))
 
-(defun next-coord (dir c)
+(defun next-coord (dir c &optional (steps 1))
   (case dir
-    (north (coord- c (make-coord 0 1)))
-    (south (coord+ c (make-coord 0 1)))
-    (west  (coord- c (make-coord 1 0)))
-    (east  (coord+ c (make-coord 1 0)))))
+    (north (coord- c (make-coord 0 steps)))
+    (south (coord+ c (make-coord 0 steps)))
+    (west  (coord- c (make-coord steps 0)))
+    (east  (coord+ c (make-coord steps 0)))))
 
 (defun turn (reldir absdir)
   (ccase reldir
