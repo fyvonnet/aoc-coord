@@ -16,8 +16,10 @@
            :manhattan-distance
            :manhattan-distance-from-origin
            :coord-angle
+           :coord-array-get
+           :coord-array-set
            :next-column
-           :next-line
+           :next-row
            :get-coords-limits
            :left :right :front :back
            :north :south :east :west))
@@ -95,7 +97,17 @@
   (atan (cdr crd) (car crd)))
 
 (defun next-column (crd) (cons (1+ (get-x crd)) (get-y crd)))
-(defun next-line   (crd) (cons 0 (1+ (get-y crd))))
+(defun next-row   (crd) (cons 0 (1+ (get-y crd))))
+
+(defun coord-array-get (arr coord)
+  (let ((x (get-x coord)) (y (get-y coord)))
+    (unless (or (< x 0) (< y 0) (>= y (array-dimension arr 0)) (>= x (array-dimension arr 1)))
+      (aref arr y x))))
+
+(defun coord-array-set (arr coord val)
+  (let ((x (get-x coord)) (y (get-y coord)))
+    (unless (or (< x 0) (< y 0) (>= y (array-dimension arr 0)) (>= x (array-dimension arr 1)))
+      (setf (aref arr y x) val))))
 
 (defun get-coords-limits (list)
   (iterate
