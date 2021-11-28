@@ -1,6 +1,8 @@
 (defpackage :aoc-coord
   (:use :cl :iterate)
-  (:export :make-coord
+  (:export :aref-coord
+           :setf aref-coord
+           :make-coord
            :make-coord
            :get-x
            :get-y
@@ -26,6 +28,13 @@
 
 (in-package :aoc-coord)
 
+(defun aref-coord (arr coord)
+  (destructuring-bind (x . y) coord
+    (aref arr y x)))
+
+(defun (setf aref-coord) (new-val arr coord)
+  (destructuring-bind (x . y) coord
+    (setf (aref arr y x) new-val)))
 
 (defun make-coord (&optional (x 0) (y 0)) (cons x y))
 (defun get-x (coord) (car coord))
