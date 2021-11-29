@@ -80,11 +80,12 @@
     (numberp (get-y c))))
 
 (defun next-coord (dir c &optional (steps 1))
-  (case dir
-    (north (coord- c (make-coord 0 steps)))
-    (south (coord+ c (make-coord 0 steps)))
-    (west  (coord- c (make-coord steps 0)))
-    (east  (coord+ c (make-coord steps 0)))))
+  (destructuring-coord (x y) c
+    (case dir
+      (north (make-coord x (- y steps)))
+      (south (make-coord x (+ y steps)))
+      (west  (make-coord (- x steps) y))
+      (east  (make-coord (+ x steps) y)))))
 
 (defun turn (reldir absdir)
   (ccase reldir
