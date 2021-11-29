@@ -1,8 +1,10 @@
 (defpackage :aoc-coord
   (:use :cl :iterate)
+  (:import-from :serapeum :nlet)
   (:export :destructuring-coord
            :aref-coord
            :setf aref-coord
+           :scan-matrix
            :make-coord
            :make-coord
            :get-x
@@ -44,6 +46,16 @@
 (defun (setf aref-coord) (new-val arr coord)
   (destructuring-coord (x y) coord
     (setf (aref arr y x) new-val)))
+
+(defun scan-matrix (func matrix &key initial-value)
+  (destructuring-bind (mtx-height mtx-width) (array-dimensions matrix)
+    (let ((nelems (* mtx-height mtx-width)))
+      (nlet rec ((i 0) (acc initial-value))
+        (if (= i nelems)
+          acc
+          (multiple-value-bind (y x) (floor i mtx-width)
+            (let ((coord (make-coord x y)))
+              (rec (1+ i) (funcall func matrix coord acc)))))))))
 
 (defun make-coord (&optional (x 0) (y 0)) (cons x y))
 (defun get-x (coord) (car coord))
