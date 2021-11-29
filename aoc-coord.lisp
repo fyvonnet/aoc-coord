@@ -1,6 +1,7 @@
 (defpackage :aoc-coord
   (:use :cl :iterate)
-  (:export :aref-coord
+  (:export :destructuring-coord
+           :aref-coord
            :setf aref-coord
            :make-coord
            :make-coord
@@ -28,12 +29,20 @@
 
 (in-package :aoc-coord)
 
+(defmacro destructuring-coord ((var-x var-y) coord &body body)
+  (let ((c (gensym)))
+    `(let* ((,c ,coord) (,var-x (pop ,c)) (,var-y ,c)) ,@body)))
+
+(defmacro destructuring-2coords ((var-xa var-ya var-xb var-yb) coord-a coord-b &body body)
+  (let ((ca (gensym)) (cb (gensym)))
+    `(let* ((,ca ,coord-a) (,cb ,coord-b) (,var-xa (pop ,ca)) (,var-ya ,ca) (,var-xb (pop ,cb)) (,var-yb ,cb)) ,@body)))
+
 (defun aref-coord (arr coord)
-  (destructuring-bind (x . y) coord
+  (destructuring-coord (x y) coord
     (aref arr y x)))
 
 (defun (setf aref-coord) (new-val arr coord)
-  (destructuring-bind (x . y) coord
+  (destructuring-coord (x y) coord
     (setf (aref arr y x) new-val)))
 
 (defun make-coord (&optional (x 0) (y 0)) (cons x y))
@@ -44,13 +53,16 @@
 (defparameter *all-absolute-dirs* '(north east south west))
 
 (defun coord+ (a b)
-  (cons (+ (get-x a) (get-x b)) (+ (get-y a) (get-y b))))
+  (destructuring-2coords (xa ya xb yb) a b
+    (cons (+ xa xb) (+ ya yb))))
 
 (defun coord- (a b)
-  (cons (- (get-x a) (get-x b)) (- (get-y a) (get-y b))))
+  (destructuring-2coords (xa ya xb yb) a b
+    (cons (- xa xb) (- ya yb))))
 
 (defun coord= (a b)
-  (and (eq (get-x a) (get-x b)) (eq (get-y a) (get-y b))))
+  (destructuring-2coords (xa ya xb yb) a b
+    (and (eq xa xb) (eq ya yb))))
 
 (defun coord< (a b)
   (cond
