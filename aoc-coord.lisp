@@ -3,8 +3,11 @@
   (:import-from :serapeum :nlet)
   (:export :destructuring-coord
            :aref-coord
+           :aref-coord-checked
+           :all-matrix-coords
            :setf aref-coord
            :scan-matrix
+           :for-all-coords
            :make-coord
            :make-coord
            :get-x
@@ -39,9 +42,31 @@
   (let ((ca (gensym)) (cb (gensym)))
     `(let* ((,ca ,coord-a) (,cb ,coord-b) (,var-xa (pop ,ca)) (,var-ya ,ca) (,var-xb (pop ,cb)) (,var-yb ,cb)) ,@body)))
 
+(defmacro for-all-coords (coord matrix &body body)
+  (let ((height (gensym)) (width (gensym)) (x (gensym)) (y (gensym)))
+    `(destructuring-bind (,height ,width) (array-dimensions ,matrix)
+       (iterate
+         (for ,y below ,height)
+         (iterate
+           (for ,x below ,width)
+           (let ((,coord (make-coord ,x ,y)))
+             ,@body))))))
+
 (defun aref-coord (arr coord)
   (destructuring-coord (x y) coord
     (aref arr y x)))
+
+(defun aref-coord-checked (arr coord &optional default-value)
+  (destructuring-bind (height width) (array-dimensions arr)
+    (destructuring-coord (x y) coord
+      (if (or (< x 0) (< y 0) (>= x width) (>= y height))
+        default-value
+        (aref arr y x)))))
+
+(defun all-matrix-coords (matrix)
+  (destructuring-bind (height width) (array-dimensions matrix)
+    (loop :for y :below height :append
+      (loop :for x :below width :collect (make-coord x y)))))
 
 (defun (setf aref-coord) (new-val arr coord)
   (destructuring-coord (x y) coord
@@ -66,15 +91,15 @@
 
 (defun coord+ (a b)
   (destructuring-2coords (xa ya xb yb) a b
-    (cons (+ xa xb) (+ ya yb))))
+                         (cons (+ xa xb) (+ ya yb))))
 
 (defun coord- (a b)
   (destructuring-2coords (xa ya xb yb) a b
-    (cons (- xa xb) (- ya yb))))
+                         (cons (- xa xb) (- ya yb))))
 
 (defun coord= (a b)
   (destructuring-2coords (xa ya xb yb) a b
-    (and (eq xa xb) (eq ya yb))))
+                         (and (eq xa xb) (eq ya yb))))
 
 (defun coord< (a b)
   (cond
