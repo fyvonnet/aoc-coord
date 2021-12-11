@@ -3,7 +3,7 @@
   (:import-from :serapeum :nlet)
   (:export :destructuring-coord
            :aref-coord
-           :aref-coord-checked
+           :aref-coord-safe
            :all-matrix-coords
            :setf aref-coord
            :scan-matrix
@@ -56,7 +56,7 @@
   (destructuring-coord (x y) coord
     (aref arr y x)))
 
-(defun aref-coord-checked (arr coord &optional default-value)
+(defun aref-coord-safe (arr coord &optional default-value)
   (destructuring-bind (height width) (array-dimensions arr)
     (destructuring-coord (x y) coord
       (if (or (< x 0) (< y 0) (>= x width) (>= y height))
